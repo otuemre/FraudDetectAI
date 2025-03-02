@@ -1,0 +1,59 @@
+# Ignore Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore environment files
+env/
+venv/
+*.env
+*.venv
+Pipfile
+Pipfile.lock
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs and output files
+logs/
+*.log
+*.out
+*.err
+
+# Ignore datasets
+src/datasets/*
+!src/datasets/README.md
+
+# Ignore model files and artifacts
+models/
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+*.onnx
+*.tflite
+
+# Ignore results and reports
+reports/
+*.csv
+*.xlsx
+*.json
+
+# Ignore cache and temporary files
+cache/
+*.tmp
+*.swp
+*.swo
+
+# Ignore VS Code settings (if using VS Code)
+.vscode/
+
+# Ignore PyCharm project settings
+.idea/
+
+# Ignore Jupyter notebook output
+*.nbconvert.ipynb
