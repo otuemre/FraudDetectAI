@@ -30,13 +30,19 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 - **Final Dataset Check** → Confirmed dataset shape, missing values, and class distribution.  
 - **Final Decision:** **Kept all features** after verifying correlation and importance.  
 
-### **3️⃣ Model Training & Evaluation (Next)**
-- Trying **XGBoost, Random Forest, and Anomaly Detection**.  
-- Hyperparameter tuning using **Optuna**.  
-- Evaluating **precision-recall, AUC-ROC** due to class imbalance.  
+**Note (March 3, 2025):**  
+**The SMOTE model might be overfitting!**  
+In the future, we will **adjust the SMOTE ratio (e.g., 7:3) and combine it with undersampling** if needed.
 
-### **4️⃣ Model Explainability & Finalization**
+### **3️⃣ Model Training & Evaluation ✅ (Completed)**
+- **Trained three XGBoost models** (Base, Weighted, SMOTE).  
+- **Hyperparameter tuning using Optuna**.  
+- **Evaluated models using precision-recall, AUC-ROC, and confusion matrices**.  
+- **Optimized models performed better, but SMOTE may have overfitting issues.**  
+
+### **4️⃣ Model Explainability & Finalization (Next)**
 - Using **SHAP** to understand feature importance.  
+- Checking for **overfitting** before final model selection.  
 - Deploying the final fraud detection model.  
 
 ---
@@ -55,12 +61,18 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 - **Feature selection analysis** showed that **all features provide useful information**, so nothing was removed.  
 - **Final dataset check passed** → No missing values, dataset is balanced & ready for training.
 
+✅ **Model Training & Evaluation Summary:**
+- **Optimized models improved performance**, especially the **Base XGBoost model**.  
+- **SMOTE XGBoost may be overfitting** due to synthetic data.  
+- **Weighted XGBoost balances recall and precision better** but needs further tuning.  
+- **Next Step:** Check **Feature Importance & Overfitting Analysis**.
+
 ---
 
 ## Next Steps 
-1. **Train XGBoost, Random Forest, and Anomaly Detection models.**  
-2. **Optimize performance using Optuna.**  
-3. **Evaluate metrics like AUC-ROC & Precision-Recall.**  
+1. **Perform SHAP Feature Importance Analysis.**  
+2. **Analyze Overfitting Risks.**  
+3. **Revisit SMOTE ratio if needed (Hybrid SMOTE + Undersampling).**  
 
 ---
 
