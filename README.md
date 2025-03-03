@@ -16,19 +16,21 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 
 ## Steps We Will Cover
 
-### **1️⃣ Exploratory Data Analysis (EDA)**
+### **1️⃣ Exploratory Data Analysis (EDA) ✅ (Completed)**
 - Dataset overview and missing value analysis.  
 - Fraud vs. Non-Fraud transaction distribution.  
 - Transaction amount & time distribution analysis.  
 - PCA feature importance analysis (V1-V28).  
 - Identified **top 5 PCA features** for fraud detection.  
 
-### **2️⃣ Data Preprocessing & Feature Engineering**
-- Handling class imbalance (SMOTE, undersampling, etc.).  
-- Feature scaling (standardization or normalization).  
-- Feature selection to improve model efficiency.  
+### **2️⃣ Data Preprocessing & Feature Engineering ✅ (Completed)**
+- **Feature Scaling** → Standardized all numerical features.  
+- **Handling Class Imbalance** → Applied **SMOTE** to balance fraud & non-fraud cases.  
+- **Feature Selection** → Verified that all features are useful (none were removed).  
+- **Final Dataset Check** → Confirmed dataset shape, missing values, and class distribution.  
+- **Final Decision:** **Kept all features** after verifying correlation and importance.  
 
-### **3️⃣ Model Training & Evaluation**
+### **3️⃣ Model Training & Evaluation (Next)**
 - Trying **XGBoost, Random Forest, and Anomaly Detection**.  
 - Hyperparameter tuning using **Optuna**.  
 - Evaluating **precision-recall, AUC-ROC** due to class imbalance.  
@@ -41,17 +43,24 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 
 ## Findings So Far
 
+✅ **EDA Highlights:**
 - **Fraud transactions are extremely rare (0.17%)**, making imbalance handling crucial.  
 - Fraud transactions occur **more often at night (1 AM - 6 AM)**.  
 - Certain **PCA features (V17, V14, V12, V10, V16) strongly correlate with fraud**.  
 - Fraud transactions **tend to have different distributions** in key features.  
 
+✅ **Preprocessing Summary:**
+- **Applied StandardScaler** for feature scaling.  
+- **Applied SMOTE** to balance fraud & non-fraud transactions.  
+- **Feature selection analysis** showed that **all features provide useful information**, so nothing was removed.  
+- **Final dataset check passed** → No missing values, dataset is balanced & ready for training.
+
 ---
 
-## Next Steps
-1. Handle **class imbalance** using resampling techniques.  
-2. **Scale and preprocess features** for better model performance.  
-3. Train **machine learning models** and evaluate performance.  
+## Next Steps 
+1. **Train XGBoost, Random Forest, and Anomaly Detection models.**  
+2. **Optimize performance using Optuna.**  
+3. **Evaluate metrics like AUC-ROC & Precision-Recall.**  
 
 ---
 
