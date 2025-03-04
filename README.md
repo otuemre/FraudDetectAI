@@ -131,6 +131,11 @@ FraudDetectAI/
 
 ---
 
+## Model Download  
+You can download the trained **XGBoost Hybrid Model** from:  
+
+**GitHub Repository:** [src/models/xgb_hybrid.pkl](https://github.com/otuemre/FraudDetectAI/blob/master/src/models/xgboost_smote_hybrid.pkl)
+
 ## Acknowledgments
 This project is based on the **Credit Card Fraud Detection dataset** from [mlg-ulb](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
 
