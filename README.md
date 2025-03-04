@@ -31,32 +31,55 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 🔹 **Final Decision:** **Kept all features** after verifying correlation and importance.  
 
 **Note (March 3, 2025):**  
-**The SMOTE model is showing signs of overfitting!**  
-We are now adjusting the **SMOTE ratio (e.g., 7:3 or 8:2) and combining it with undersampling** to improve generalization.  
+**The SMOTE model was overfitting.**  
+We **adjusted SMOTE ratios** and combined it with **undersampling** to improve generalization.
 
 ### **Model Training & Evaluation ✅ (Completed)**  
-🔹 **Trained three XGBoost models** (Base, Weighted, SMOTE).  
+🔹 **Trained multiple XGBoost models** (Base, Weighted, SMOTE, Hybrid).  
 🔹 **Hyperparameter tuning using Optuna**.  
 🔹 **Evaluated models using precision-recall, AUC-ROC, and confusion matrices**.  
-🔹 **Optimized models performed better, but SMOTE may have overfitting issues.**  
+🔹 **SMOTE XGBoost was overfitting, Hybrid SMOTE fixed this issue.**  
 
 ### **Feature Importance Analysis ✅ (Completed)**  
 🔹 Used **SHAP (SHapley Additive Explanations)** to analyze model decisions.  
 🔹 Generated **SHAP Summary Plot** → Visualizing overall feature impact.  
 🔹 Created **SHAP Decision & Waterfall Plots** → Understanding individual fraud predictions.  
-🔹 **V4, V14, V12 emerged as key fraud indicators**.  
+🔹 **V4, V14, V12 emerged as key fraud indicators.**  
 
 ### **Overfitting Analysis ✅ (Completed)**  
-🔹 **Comparing Train vs. Test Performance** → Checked precision, recall, F1-score, and AUC-ROC.  
+🔹 **Compared Train vs. Test Performance** → Checked precision, recall, F1-score, and AUC-ROC.  
 🔹 **Plotted Learning Curves** → Visualized training & validation loss trends.  
-🔹 **Confirmed Overfitting in SMOTE XGBoost** → Training loss is nearly **0.0**, but precision dropped.  
-🔹 **Final Decision:** We need to **modify SMOTE strategy** to improve model generalization.  
+🔹 **Confirmed Overfitting in SMOTE XGBoost** → Training loss was nearly **0.0**, but recall was artificially high.  
+🔹 **Final Decision:** Modified SMOTE with **Hybrid Sampling** (Oversampling + Undersampling).  
 
-### **SMOTE Adjustment (In Progress)**  
-🔹 **Testing multiple SMOTE ratios** (e.g., **70:30, 60:40**) instead of full 1:1 balancing.  
-🔹 **Applying Hybrid Sampling** → Combining **undersampling & SMOTE** to prevent overfitting.  
-🔹 **Re-training XGBoost models** to check if the updated dataset improves performance.  
-🔹 **Final Decision:** Will be based on **new precision, recall, and learning curve analysis**.  
+### **SMOTE Adjustment ✅ (Completed)**  
+🔹 **Tested multiple SMOTE ratios** (e.g., **70:30, 60:40**) instead of full 1:1 balancing.  
+🔹 **Applied Hybrid Sampling** → Combined **undersampling & SMOTE** to prevent overfitting.  
+🔹 **Re-trained XGBoost models** → Verified that the new dataset improved performance.  
+🔹 **Final Decision:** **Hybrid SMOTE XGBoost is the best-performing model!**  
+
+---
+
+## **Final Model Performance**  
+After applying **Hybrid SMOTE (Oversampling + Undersampling)**, the final model achieved the following results:
+
+### **SMOTE Hybrid XGBoost Model Performance:**
+| Metric        | Class 0 (Non-Fraud) | Class 1 (Fraud) | Overall    |
+|---------------|---------------------|-----------------|------------|
+| **Precision** | 0.98                | 0.99            | -          |
+| **Recall**    | 1.00                | 0.96            | -          |
+| **F1-Score**  | 0.99                | 0.97            | -          |
+| **AUC-ROC**   | -                   | -               | **0.9982** |
+
+- **Overfitting has been significantly reduced!**  
+- **The model generalizes much better while maintaining high recall!**  
+
+---
+
+## **Final Learning Curve**
+The learning curve for the **Hybrid SMOTE XGBoost** model shows **smooth convergence**, meaning the model is no longer overfitting:
+
+![Learning Curve - Hybrid SMOTE](./src/images/learning_curve_smote_xgboost_hybrid.png)
 
 ---
 
@@ -70,15 +93,9 @@ We are now adjusting the **SMOTE ratio (e.g., 7:3 or 8:2) and combining it with 
 
 **Preprocessing Summary:**  
 - **Applied StandardScaler** for feature scaling.  
-- **Applied SMOTE** to balance fraud & non-fraud transactions.  
-- **Feature selection analysis** showed that **all features provide useful information**, so nothing was removed.  
+- **Tested different SMOTE strategies** (Baseline, Weighted, Hybrid).  
+- **Hybrid SMOTE (Oversampling + Undersampling) significantly improved model performance.**  
 - **Final dataset check passed** → No missing values, dataset is balanced & ready for training.  
-
-**Model Training & Evaluation Summary:**  
-- **Optimized models improved performance**, especially the **Base XGBoost model**.  
-- **SMOTE XGBoost is overfitting**, likely due to excessive synthetic data.  
-- **Weighted XGBoost balances recall and precision better** but needs further tuning.  
-- **Next Step:** **Adjust SMOTE strategy and re-train models.**  
 
 **Feature Importance Summary:**  
 - **SHAP analysis confirmed that V4, V14, and V12 are key fraud indicators.**  
@@ -86,16 +103,15 @@ We are now adjusting the **SMOTE ratio (e.g., 7:3 or 8:2) and combining it with 
 - **Decision plots reveal how fraud risk increases with certain feature values.**  
 
 **Overfitting Summary:**  
-- **SMOTE XGBoost is overfitting** (near-zero training loss).  
-- **Precision is dropping, meaning it detects fraud too aggressively**.  
-- **We are adjusting SMOTE to fix this issue!**  
+- **SMOTE XGBoost was overfitting** (near-zero training loss, high recall but unrealistic performance).  
+- **Hybrid SMOTE significantly improved generalization** while maintaining strong fraud detection capability.  
 
 ---
 
-## Next Steps  
-1. **Test different SMOTE ratios & hybrid sampling (Notebook 06).**  
-2. **Re-train & evaluate models on new resampled datasets.**  
-3. **Compare new performance with old results to finalize the best model.**  
+## **Final Steps Before Deployment**
+1. **Save & document the final model.**  
+2. **Prepare for model deployment.**  
+3. **Wrap up the project with a final report.**
 
 ---
 
