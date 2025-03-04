@@ -31,8 +31,8 @@ Using **imbalanced learning techniques**, feature engineering, and powerful mode
 🔹 **Final Decision:** **Kept all features** after verifying correlation and importance.  
 
 **Note (March 3, 2025):**  
-**The SMOTE model might be overfitting!**  
-In the future, we will **adjust the SMOTE ratio (e.g., 7:3) and combine it with undersampling** if needed.  
+**The SMOTE model is showing signs of overfitting!**  
+We are now adjusting the **SMOTE ratio (e.g., 7:3 or 8:2) and combining it with undersampling** to improve generalization.  
 
 ### **Model Training & Evaluation ✅ (Completed)**  
 🔹 **Trained three XGBoost models** (Base, Weighted, SMOTE).  
@@ -46,11 +46,17 @@ In the future, we will **adjust the SMOTE ratio (e.g., 7:3) and combine it with 
 🔹 Created **SHAP Decision & Waterfall Plots** → Understanding individual fraud predictions.  
 🔹 **V4, V14, V12 emerged as key fraud indicators**.  
 
-### **Overfitting Analysis ️ (In Progress)**  
-🔹 **Comparing Train vs. Test Performance** → Checking precision, recall, F1-score, and AUC-ROC.  
-🔹 **Plotting Learning Curves** → Visualizing training & validation loss trends.  
-🔹 **Inspecting Feature Importance** → Ensuring the model isn’t over-relying on synthetic features.  
-🔹 If overfitting is detected, we will **adjust SMOTE ratio or introduce undersampling**.  
+### **Overfitting Analysis ✅ (Completed)**  
+🔹 **Comparing Train vs. Test Performance** → Checked precision, recall, F1-score, and AUC-ROC.  
+🔹 **Plotted Learning Curves** → Visualized training & validation loss trends.  
+🔹 **Confirmed Overfitting in SMOTE XGBoost** → Training loss is nearly **0.0**, but precision dropped.  
+🔹 **Final Decision:** We need to **modify SMOTE strategy** to improve model generalization.  
+
+### **SMOTE Adjustment (In Progress)**  
+🔹 **Testing multiple SMOTE ratios** (e.g., **70:30, 60:40**) instead of full 1:1 balancing.  
+🔹 **Applying Hybrid Sampling** → Combining **undersampling & SMOTE** to prevent overfitting.  
+🔹 **Re-training XGBoost models** to check if the updated dataset improves performance.  
+🔹 **Final Decision:** Will be based on **new precision, recall, and learning curve analysis**.  
 
 ---
 
@@ -70,21 +76,26 @@ In the future, we will **adjust the SMOTE ratio (e.g., 7:3) and combine it with 
 
 **Model Training & Evaluation Summary:**  
 - **Optimized models improved performance**, especially the **Base XGBoost model**.  
-- **SMOTE XGBoost may be overfitting** due to synthetic data.  
+- **SMOTE XGBoost is overfitting**, likely due to excessive synthetic data.  
 - **Weighted XGBoost balances recall and precision better** but needs further tuning.  
-- **Next Step:** Check **Overfitting Risks & Adjust SMOTE** if needed.  
+- **Next Step:** **Adjust SMOTE strategy and re-train models.**  
 
 **Feature Importance Summary:**  
 - **SHAP analysis confirmed that V4, V14, and V12 are key fraud indicators.**  
 - **Transaction amount also has a moderate influence** on fraud detection.  
 - **Decision plots reveal how fraud risk increases with certain feature values.**  
 
+**Overfitting Summary:**  
+- **SMOTE XGBoost is overfitting** (near-zero training loss).  
+- **Precision is dropping, meaning it detects fraud too aggressively**.  
+- **We are adjusting SMOTE to fix this issue!**  
+
 ---
 
 ## Next Steps  
-1. **Analyze Overfitting Risks.**  
-2. **Revisit SMOTE ratio if needed (Hybrid SMOTE + Undersampling).**  
-3. **Finalize model selection and proceed with deployment.**  
+1. **Test different SMOTE ratios & hybrid sampling (Notebook 06).**  
+2. **Re-train & evaluate models on new resampled datasets.**  
+3. **Compare new performance with old results to finalize the best model.**  
 
 ---
 
