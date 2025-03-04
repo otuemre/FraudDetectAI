@@ -133,3 +133,6 @@ FraudDetectAI/
 
 ## Acknowledgments
 This project is based on the **Credit Card Fraud Detection dataset** from [mlg-ulb](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
+
+## License
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE.md) file for details.
