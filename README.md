@@ -1,5 +1,17 @@
 # FraudDetectAI - A Fraud Detection AI  
 
+![Python](https://img.shields.io/badge/Python-3.9-blue?style=flat-square)
+![pandas](https://img.shields.io/badge/pandas-2.2.3-blue?style=flat-square)
+![numpy](https://img.shields.io/badge/numpy-2.1.3-blue?style=flat-square)
+![matplotlib](https://img.shields.io/badge/matplotlib-3.10.1-blue?style=flat-square)
+![seaborn](https://img.shields.io/badge/seaborn-0.13.2-blue?style=flat-square)
+![jupyter](https://img.shields.io/badge/jupyter-1.1.1-blue?style=flat-square)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6.1-blue?style=flat-square)
+![xgboost](https://img.shields.io/badge/xgboost-2.1.4-blue?style=flat-square)
+![optuna](https://img.shields.io/badge/optuna-4.2.1-blue?style=flat-square)
+![imbalanced-learn](https://img.shields.io/badge/imbalanced--learn-0.13.0-blue?style=flat-square)
+![shap](https://img.shields.io/badge/shap-0.46.0-blue?style=flat-square)
+
 # Table of Contents
 - [Project Overview](#project-overview)
 - [Objectives](#objectives)
