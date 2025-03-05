@@ -1,6 +1,7 @@
 # FraudDetectAI - A Fraud Detection AI  
 
 ![Python](https://img.shields.io/badge/Python-3.9-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green)
 ![pandas](https://img.shields.io/badge/pandas-2.2.3-blue?style=flat-square)
 ![numpy](https://img.shields.io/badge/numpy-2.1.3-blue?style=flat-square)
 ![matplotlib](https://img.shields.io/badge/matplotlib-3.10.1-blue?style=flat-square)
