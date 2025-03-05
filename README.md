@@ -1,5 +1,24 @@
 # FraudDetectAI - A Fraud Detection AI  
 
+# Table of Contents
+- [Project Overview](#project-overview)
+- [Objectives](#objectives)
+- [Steps We Have Covered](#steps-we-have-covered)
+  - [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+  - [Data Preprocessing & Feature Engineering](#data-preprocessing--feature-engineering)
+  - [Model Training & Evaluation](#model-training--evaluation)
+  - [Feature Importance Analysis](#feature-importance-analysis)
+  - [Overfitting Analysis](#overfitting-analysis)
+  - [SMOTE Adjustment](#smote-adjustment)
+- [Final Model Performance](#final-model-performance)
+- [Final Learning Curve](#final-learning-curve)
+- [Findings So Far](#findings-so-far)
+- [Final Steps Before Deployment](#final-steps-before-deployment)
+- [Project Structure](#project-structure)
+- [Model Download](#model-download)
+- [Acknowledgments](#acknowledgments)
+- [License](#license)
+
 ## Project Overview  
 FraudDetectAI is a machine learning-based system designed to **detect fraudulent credit card transactions**.  
 Using **imbalanced learning techniques**, feature engineering, and powerful models like **XGBoost**, this project aims to build a **highly accurate fraud detection system**.  
