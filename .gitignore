@@ -38,10 +38,9 @@ models/
 *.tflite
 
 # Ignore results and reports
-reports/
-*.csv
-*.xlsx
-*.json
+reports/*.csv
+reports/*.xlsx
+reports/*.json
 
 # Ignore cache and temporary files
 cache/
