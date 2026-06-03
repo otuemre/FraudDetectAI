@@ -1,0 +1,24 @@
+{
+    "name": "FraudDetectAI",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "charliermarsh.ruff",
+                "ms-python.python",
+                "ms-python.debugpy",
+                "ms-python.pylance",
+                "ms-toolsai.jupyter",
+                "eamodio.gitlens",
+                "mtxr.sqltools",
+                "mtxr.sqltools-driver-pg",
+                "ckolkman.vscode-postgres",
+                "ms-azuretools.vscode-docker",
+                "redhat.vscode-yaml",
+                "mechatroner.rainbow-csv",
+                "njpwerner.autodocstring"
+            ]
+        }
+    },
+    "postCreateCommand": "pip install -r requirements.txt"
+}
