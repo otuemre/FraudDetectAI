@@ -25,6 +25,9 @@ def load_csv_to_db(csv_path: str, table_name: str) -> None:
     # Read the CSV file into a DataFrame
     df = pd.read_csv(csv_path)
 
+    # Normalize feature names (Convert to lowercase)
+    df.columns = df.columns.str.lower()
+
     # Load the DataFrame into the database
     df.to_sql(table_name, engine, if_exists="replace", index=False, chunksize=10000)
 
