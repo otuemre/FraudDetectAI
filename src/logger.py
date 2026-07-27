@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -64,3 +65,21 @@ def get_error_logger() -> logging.Logger:
         logger.addHandler(file_handler)
 
     return logger
+
+
+def log_exception(
+    logger: logging.Logger, original_exception: Exception, sys_module=sys
+):
+    """
+    Wraps an exception in CustomException, logs it as structured JSON,
+    and returns the CustomException so the caller can re-raise it if needed.
+
+    Usage:
+        except Exception as e:
+            raise log_exception(error_logger, e) from e
+    """
+    from src.exception import CustomException
+
+    ce = CustomException(original_exception, sys_module)
+    logger.error(ce.to_dict())
+    return ce
