@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -89,5 +90,39 @@ def load_scaler(file_name: str = "scaler.joblib") -> RobustScaler:
         scaler_path = MODELS_DIR / file_name
         scaler = joblib.load(scaler_path)
         return scaler
+    except Exception as e:
+        raise log_exception(error_logger, e) from e
+
+
+# Prediction Log
+def save_prediction_log(
+    input_features: dict,
+    predicted_class: int,
+    fraud_probability: float,
+    model_version: str,
+    latency_ms: float,
+) -> None:
+    """Inserts one prediction record into the prediction_logs table."""
+    try:
+        query = text("""
+            INSERT INTO prediction_logs
+                (input_features, predicted_class, fraud_probability, model_version, latency_ms)
+            VALUES
+                (:input_features, :predicted_class, :fraud_probability, :model_version, :latency_ms)
+        """)
+
+        with engine.connect() as conn:
+            conn.execute(
+                query,
+                {
+                    "input_features": json.dumps(input_features),
+                    "predicted_class": predicted_class,
+                    "fraud_probability": fraud_probability,
+                    "model_version": model_version,
+                    "latency_ms": latency_ms,
+                },
+            )
+            conn.commit()
+
     except Exception as e:
         raise log_exception(error_logger, e) from e
