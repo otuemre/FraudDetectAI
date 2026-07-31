@@ -1,14 +1,13 @@
 import json
-import os
 from pathlib import Path
 
 import joblib
 import pandas as pd
-from dotenv import load_dotenv
 from sklearn.preprocessing import RobustScaler
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from xgboost import XGBClassifier
 
+from src.db.get_engine import get_engine
 from src.logger import get_error_logger, log_exception
 
 error_logger = get_error_logger()
@@ -19,17 +18,7 @@ MODELS_DIR = BASE_DIR / "models"
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Database Connection
-load_dotenv()
-
-DB_URL = (
-    f"postgresql://"
-    f"{os.getenv('POSTGRES_USER', 'postgres')}:"
-    f"{os.getenv('POSTGRES_PASSWORD', 'postgres')}@"
-    f"localhost:5432/"
-    f"{os.getenv('POSTGRES_DB', 'frauddetect')}"
-)
-
-engine = create_engine(DB_URL)
+engine = get_engine()
 
 
 # Data Fetching and Saving Functions
