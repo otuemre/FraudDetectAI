@@ -15,5 +15,6 @@ python-dotenv
 
 fastapi
 uvicorn
+requests
 
 tensorflow
