@@ -1,10 +1,9 @@
-seed: 42
-
 data:
   source_table: transactions
   training_table: train_transactions
   testing_table: test_transactions
   test_size: 0.2
+  seed: 42
 
 preprocessing:
   scale_columns: [amount, hour_of_day]
@@ -12,6 +11,7 @@ preprocessing:
 training:
   n_splits: 5
   n_trials: 50
+  seed: 42
   scoring_metric: average_precision
 
 model:
@@ -25,6 +25,7 @@ monitoring:
   psi_bins: 10
   psi_watch_threshold: 0.1
   psi_alert_threshold: 0.25
+  limit: 5000
 
 simulation:
   limit: null

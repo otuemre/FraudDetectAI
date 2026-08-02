@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import requests
 
+from src.config import CONFIG
 from src.logger import get_error_logger, log_exception
 from src.utils import get_data
 
@@ -61,7 +62,10 @@ def simulate_stream(
 
 
 if __name__ == "__main__":
-    results = simulate_stream(limit=None, delay_seconds=0)
+    results = simulate_stream(
+        limit=CONFIG["simulation"]["limit"],
+        delay_seconds=CONFIG["simulation"]["delay_seconds"],
+    )
 
     # Keep it if you want to learn the accuracy, however in real-world application we don't know the true label.
     accuracy = (results["true_class"] == results["predicted_class"]).mean()

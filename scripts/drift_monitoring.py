@@ -2,15 +2,16 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import text
 
+from src.config import CONFIG
 from src.db.get_engine import get_engine
 from src.logger import get_error_logger, log_exception
 from src.utils import get_data
 
 error_logger = get_error_logger()
 
-PSI_BINS = 10
-DRIFT_WATCH_THRESHOLD = 0.1
-DRIFT_ALERT_THRESHOLD = 0.25
+PSI_BINS = CONFIG["monitoring"]["psi_bins"]
+DRIFT_WATCH_THRESHOLD = CONFIG["monitoring"]["psi_watch_threshold"]
+DRIFT_ALERT_THRESHOLD = CONFIG["monitoring"]["psi_alert_threshold"]
 
 
 def _calculate_psi(
@@ -109,7 +110,7 @@ def run_drift_check(limit: int = 5000) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    drift_report = run_drift_check(limit=5000)
+    drift_report = run_drift_check(limit=CONFIG["monitoring"]["limit"])
     print("Drift Report (sorted by PSI, highest first):\n")
     print(drift_report.to_string(index=False))
 

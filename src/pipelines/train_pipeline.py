@@ -4,6 +4,7 @@ from src.components.data_ingestion import ingest_data
 from src.components.evaluation import evaluate_model
 from src.components.hyperparameter_tuning import tune_hyperparameters
 from src.components.preprocessing import raw_time_to_hours, train_scaler, use_scaler
+from src.config import CONFIG
 from src.logger import get_error_logger, get_training_logger, log_exception
 from src.utils import get_data, save_model, save_scaler
 
@@ -82,5 +83,6 @@ def training_pipeline(n_trials: int = 5) -> dict:
 
 
 if __name__ == "__main__":
-    results = training_pipeline()
+    N_TRIALS = CONFIG["training"]["n_trials"]
+    results = training_pipeline(n_trials=N_TRIALS)
     print(results)

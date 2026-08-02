@@ -3,13 +3,14 @@ from optuna.samplers import TPESampler
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from xgboost import XGBClassifier
 
+from src.config import CONFIG
 from src.logger import get_error_logger, log_exception
 
 error_logger = get_error_logger()
 
-SEED = 42
-N_SPLITS = 5
-N_TRIALS = 50
+SEED = CONFIG["training"]["seed"]
+N_SPLITS = CONFIG["training"]["n_splits"]
+N_TRIALS = CONFIG["training"]["n_trials"]
 
 
 def _build_objective(X_train, y_train, cv, scale_pos_weight_base):

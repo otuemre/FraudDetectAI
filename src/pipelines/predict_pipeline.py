@@ -3,12 +3,13 @@ import time
 import pandas as pd
 
 from src.components.preprocessing import raw_time_to_hours, use_scaler
+from src.config import CONFIG
 from src.logger import get_error_logger, log_exception
 from src.utils import load_model, load_scaler, save_prediction_log
 
 error_logger = get_error_logger()
 
-MODEL_VERSION = "xgboost_v1"
+MODEL_VERSION = CONFIG["model"]["version"]
 
 
 def predict_single(transaction: dict) -> dict:

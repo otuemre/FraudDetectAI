@@ -1,13 +1,14 @@
 import pandas as pd
 from sqlalchemy import text
 
+from src.config import CONFIG
 from src.db.get_engine import get_engine
 from src.logger import get_error_logger, log_exception
 
 error_logger = get_error_logger()
 
-LOW_CONFIDENCE_LOWER = 0.4
-LOW_CONFIDENCE_UPPER = 0.6
+LOW_CONFIDENCE_LOWER = CONFIG["monitoring"]["low_confidence_lower"]
+LOW_CONFIDENCE_UPPER = CONFIG["monitoring"]["low_confidence_upper"]
 
 
 def get_low_confidence_predictions(

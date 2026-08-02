@@ -1,12 +1,13 @@
 from sklearn.model_selection import train_test_split
 
+from src.config import CONFIG
 from src.logger import get_error_logger, log_exception
 from src.utils import get_data, save_data
 
 error_logger = get_error_logger()
 
-SEED = 42
-TEST_SIZE = 0.2
+SEED = CONFIG["data"]["seed"]
+TEST_SIZE = CONFIG["data"]["test_size"]
 
 
 def ingest_data(source_table: str = "transactions") -> None:

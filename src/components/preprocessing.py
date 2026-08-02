@@ -1,11 +1,12 @@
 import pandas as pd
 from sklearn.preprocessing import RobustScaler
 
+from src.config import CONFIG
 from src.logger import get_error_logger, log_exception
 
 error_logger = get_error_logger()
 
-SCALE_COLS = ["amount", "hour_of_day"]
+SCALE_COLS = CONFIG["preprocessing"]["scale_columns"]
 
 
 # Feature Engineering
