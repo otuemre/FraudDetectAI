@@ -17,4 +17,7 @@ fastapi
 uvicorn
 requests
 
+pytest
+httpx2
+
 tensorflow
