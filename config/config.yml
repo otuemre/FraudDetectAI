@@ -1,0 +1,37 @@
+seed: 42
+
+data:
+  source_table: transactions
+  training_table: train_transactions
+  testing_table: test_transactions
+  test_size: 0.2
+
+preprocessing:
+  scale_columns: [amount, hour_of_day]
+
+training:
+  n_splits: 5
+  n_trials: 50
+  scoring_metric: average_precision
+
+model:
+  version: xgboost_v1
+  filename: final_xgb_model.json
+  scaler_filename: scaler.joblib
+
+monitoring:
+  low_confidence_lower: 0.4
+  low_confidence_upper: 0.6
+  psi_bins: 10
+  psi_watch_threshold: 0.1
+  psi_alert_threshold: 0.25
+
+simulation:
+  limit: null
+  delay_seconds: 1
+
+api:
+  title: FraudDetectAI
+  version: 1.0.0
+  host: 0.0.0.0
+  port: 8000
