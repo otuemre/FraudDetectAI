@@ -1,175 +1,210 @@
-# FraudDetectAI - A Fraud Detection AI  
+# FraudDetectAI
 
-![Python](https://img.shields.io/badge/Python-3.9-blue?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-green)
-![pandas](https://img.shields.io/badge/pandas-2.2.3-blue?style=flat-square)
-![numpy](https://img.shields.io/badge/numpy-2.1.3-blue?style=flat-square)
-![matplotlib](https://img.shields.io/badge/matplotlib-3.10.1-blue?style=flat-square)
-![seaborn](https://img.shields.io/badge/seaborn-0.13.2-blue?style=flat-square)
-![jupyter](https://img.shields.io/badge/jupyter-1.1.1-blue?style=flat-square)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6.1-blue?style=flat-square)
-![xgboost](https://img.shields.io/badge/xgboost-2.1.4-blue?style=flat-square)
-![optuna](https://img.shields.io/badge/optuna-4.2.1-blue?style=flat-square)
-![imbalanced-learn](https://img.shields.io/badge/imbalanced--learn-0.13.0-blue?style=flat-square)
-![shap](https://img.shields.io/badge/shap-0.46.0-blue?style=flat-square)
+[![Run Tests](https://github.com/otuemre/FraudDetectAI/actions/workflows/tests.yml/badge.svg)](https://github.com/otuemre/FraudDetectAI/actions/workflows/tests.yml)
 
-# Table of Contents
-- [Project Overview](#project-overview)
-- [Objectives](#objectives)
-- [Steps We Have Covered](#steps-we-have-covered)
-  - [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
-  - [Data Preprocessing & Feature Engineering](#data-preprocessing--feature-engineering)
-  - [Model Training & Evaluation](#model-training--evaluation)
-  - [Feature Importance Analysis](#feature-importance-analysis)
-  - [Overfitting Analysis](#overfitting-analysis)
-  - [SMOTE Adjustment](#smote-adjustment)
-- [Final Model Performance](#final-model-performance)
-- [Final Learning Curve](#final-learning-curve)
-- [Findings So Far](#findings-so-far)
-- [Final Steps Before Deployment](#final-steps-before-deployment)
+A production-oriented credit card fraud detection system — from raw transaction data to a served, monitored model. Built to reflect how a real ML system is engineered, not just how a model is trained: SQL-backed data pipelines, tuned XGBoost with a class-imbalance strategy comparison, unsupervised baselines, SHAP explainability, a FastAPI serving layer, structured logging, drift/latency monitoring, and CI-tested components.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Modeling Approach](#modeling-approach)
+- [Results](#results)
+- [Explainability](#explainability)
+- [Monitoring](#monitoring)
 - [Project Structure](#project-structure)
-- [Model Download](#model-download)
-- [Acknowledgments](#acknowledgments)
-- [License](#license)
+- [Getting Started](#getting-started)
+- [API Usage](#api-usage)
+- [Testing & CI/CD](#testing--cicd)
+- [Design Decisions Worth Noting](#design-decisions-worth-noting)
+- [Future Work](#future-work)
 
-## Project Overview  
-FraudDetectAI is a machine learning-based system designed to **detect fraudulent credit card transactions**.  
-Using **imbalanced learning techniques**, feature engineering, and powerful models like **XGBoost**, this project aims to build a **highly accurate fraud detection system**.  
+## Overview
 
----
+FraudDetectAI classifies credit card transactions as fraudulent or legitimate using the well-known [ULB Credit Card Fraud dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) (284,807 transactions, 0.17% fraud rate, PCA-anonymized features `v1`–`v28`).
 
-## Objectives  
-- Understand the nature of fraudulent transactions.  
-- Handle **highly imbalanced data** effectively.  
-- Build a **robust classification model** for fraud detection.  
-- Use **explainability techniques** (SHAP) to interpret model predictions.  
+The project's goal wasn't just "train a good classifier" — it's a full pipeline: data lives in Postgres, gets ingested and split reproducibly, feeds a tuned XGBoost model compared against three alternative strategies, gets served via a REST API, and is monitored in production-realistic ways (without peeking at ground truth it wouldn't have in real life).
 
----
+## Architecture
 
-## Steps We Have Covered  
+```
+Postgres (raw transactions)
+        │
+        ▼
+ data_ingestion  →  dedup + stratified split  →  training_data / testing_data (SQL)
+        │
+        ▼
+ preprocessing   →  hour_of_day engineering + RobustScaler (fit on train only)
+        │
+        ▼
+ hyperparameter_tuning (Optuna, PR-AUC objective)
+        │
+        ▼
+ XGBoost (final fit)  →  evaluation  →  model + scaler persisted to disk
+        │
+        ▼
+   FastAPI (/predict, /health)
+        │
+        ▼
+ prediction_logs (Postgres)  →  monitoring (confidence bands, PSI drift, latency)
+```
 
-### **Exploratory Data Analysis (EDA) ✅ (Completed)**  
-🔹 Dataset overview and missing value analysis.  
-🔹 Fraud vs. Non-Fraud transaction distribution.  
-🔹 Transaction amount & time distribution analysis.  
-🔹 PCA feature importance analysis (V1-V28).  
-🔹 Identified **top 5 PCA features** for fraud detection.  
+## Modeling Approach
 
-### **Data Preprocessing & Feature Engineering ✅ (Completed)**  
-🔹 **Feature Scaling** → Standardized all numerical features.  
-🔹 **Handling Class Imbalance** → Applied **SMOTE** to balance fraud & non-fraud cases.  
-🔹 **Feature Selection** → Verified that all features are useful (none were removed).  
-🔹 **Final Dataset Check** → Confirmed dataset shape, missing values, and class distribution.  
-🔹 **Final Decision:** **Kept all features** after verifying correlation and importance.  
+**Why RobustScaler, not StandardScaler:** `v1`–`v28` arrive already PCA-transformed and roughly standardized. Only `amount` and the engineered `hour_of_day` needed scaling — and `amount` is heavily right-skewed with real outliers in both classes, so a scaler built on median/IQR (RobustScaler) is far less distorted by extreme values than one built on mean/standard deviation.
 
-**Note (March 3, 2025):**  
-**The SMOTE model was overfitting.**  
-We **adjusted SMOTE ratios** and combined it with **undersampling** to improve generalization.
+**Feature engineering:** raw `time` (seconds since first transaction) is only meaningful as a cyclical day/night signal, not as a raw offset. It's converted to `hour_of_day` (0–24), which EDA showed fraud disproportionately concentrated in overnight hours relative to legitimate traffic.
 
-### **Model Training & Evaluation ✅ (Completed)**  
-🔹 **Trained multiple XGBoost models** (Base, Weighted, SMOTE, Hybrid).  
-🔹 **Hyperparameter tuning using Optuna**.  
-🔹 **Evaluated models using precision-recall, AUC-ROC, and confusion matrices**.  
-🔹 **SMOTE XGBoost was overfitting, Hybrid SMOTE fixed this issue.**  
+**Class imbalance — four strategies compared** (5-fold stratified CV on the training set):
 
-### **Feature Importance Analysis ✅ (Completed)**  
-🔹 Used **SHAP (SHapley Additive Explanations)** to analyze model decisions.  
-🔹 Generated **SHAP Summary Plot** → Visualizing overall feature impact.  
-🔹 Created **SHAP Decision & Waterfall Plots** → Understanding individual fraud predictions.  
-🔹 **V4, V14, V12 emerged as key fraud indicators.**  
+| Model | Accuracy | Precision | Recall | PR-AUC |
+|---|---|---|---|---|
+| Logistic Regression (class_weight) | 0.9743 | 0.0566 | 0.9126 | 0.7520 |
+| Logistic Regression + SMOTE | 0.9902 | 0.1408 | 0.8889 | 0.7563 |
+| XGBoost (class_weight) | 0.9996 | **0.9058** | 0.8280 | 0.8489 |
+| XGBoost + SMOTE | 0.9995 | 0.8404 | 0.8359 | 0.8575 |
 
-### **Overfitting Analysis ✅ (Completed)**  
-🔹 **Compared Train vs. Test Performance** → Checked precision, recall, F1-score, and AUC-ROC.  
-🔹 **Plotted Learning Curves** → Visualized training & validation loss trends.  
-🔹 **Confirmed Overfitting in SMOTE XGBoost** → Training loss was nearly **0.0**, but recall was artificially high.  
-🔹 **Final Decision:** Modified SMOTE with **Hybrid Sampling** (Oversampling + Undersampling).  
+> Logistic regression hit sklearn's `lbfgs` convergence limit (`max_iter` reached without converging) in both variants — its precision numbers above should be read as directional, not a fully-converged baseline. Even accounting for that, the qualitative conclusion holds: at this precision level (~1 correct fraud flag per 7–18 alerts), logistic regression isn't viable for a real alerting system regardless of convergence.
 
-### **SMOTE Adjustment ✅ (Completed)**  
-🔹 **Tested multiple SMOTE ratios** (e.g., **70:30, 60:40**) instead of full 1:1 balancing.  
-🔹 **Applied Hybrid Sampling** → Combined **undersampling & SMOTE** to prevent overfitting.  
-🔹 **Re-trained XGBoost models** → Verified that the new dataset improved performance.  
-🔹 **Final Decision:** **Hybrid SMOTE XGBoost is the best-performing model!**  
+XGBoost with class-weighting was selected over SMOTE — comparable PR-AUC, but meaningfully better precision and a tighter cross-validation variance, which matters more for an alerting system than a marginal PR-AUC gain.
 
----
+**Hyperparameter tuning:** Optuna (TPE sampler, 50 trials, 5-fold stratified CV, optimizing average precision) tuned `max_depth`, `learning_rate`, `subsample`, `colsample_bytree`, `min_child_weight`, `gamma`, `reg_alpha`, `reg_lambda`, and `scale_pos_weight` (searched around the theoretical class-ratio value rather than fixing it), reaching a best CV PR-AUC of 0.8526.
 
-## **Final Model Performance**  
-After applying **Hybrid SMOTE (Oversampling + Undersampling)**, the final model achieved the following results:
+## Results
 
-### **SMOTE Hybrid XGBoost Model Performance:**
-| Metric        | Class 0 (Non-Fraud) | Class 1 (Fraud) | Overall    |
-|---------------|---------------------|-----------------|------------|
-| **Precision** | 0.98                | 0.99            | -          |
-| **Recall**    | 1.00                | 0.96            | -          |
-| **F1-Score**  | 0.99                | 0.97            | -          |
-| **AUC-ROC**   | -                   | -               | **0.9982** |
+Final tuned XGBoost, evaluated once on the held-out test set (never touched during CV or tuning):
 
-- **Overfitting has been significantly reduced!**  
-- **The model generalizes much better while maintaining high recall!**  
+| Metric | Value |
+|---|---|
+| Precision (Fraud) | 0.9157 |
+| Recall (Fraud) | 0.8000 |
+| F1 (Fraud) | 0.8539 |
+| PR-AUC | 0.8143 |
+| ROC-AUC | 0.9799 |
 
----
+Test-set PR-AUC (0.8143) sits a bit below the best CV PR-AUC (0.8526) — expected, since CV reports an average across folds while the test set is a single held-out sample; the gap isn't a sign of a problem, just normal variance between a multi-fold estimate and one final held-out check.
 
-## **Final Learning Curve**
-The learning curve for the **Hybrid SMOTE XGBoost** model shows **smooth convergence**, meaning the model is no longer overfitting:
+**Unsupervised comparison** (phase 2, trained without fraud labels):
 
-![Learning Curve - Hybrid SMOTE](./src/images/learning_curve_smote_xgboost_hybrid.png)
+| Model | Precision | Recall | F1 (Fraud) |
+|---|---|---|---|
+| XGBoost (supervised) | 0.893 | 0.789 | 0.838 |
+| AutoEncoder (reconstruction error) | 0.47 | 0.47 | 0.47 |
+| Isolation Forest | 0.224 | 0.232 | 0.228 |
 
----
+The AutoEncoder (trained only on legitimate transactions, flagged by reconstruction error) roughly doubles Isolation Forest's F1 by learning a joint representation of "normal" across all 30 features, rather than isolating on individual splits — but both unsupervised approaches trail the supervised model significantly, since neither ever sees an actual fraud example during training.
 
-## Findings So Far  
+## Explainability
 
-**EDA Highlights:**  
-- **Fraud transactions are extremely rare (0.17%)**, making imbalance handling crucial.  
-- Fraud transactions occur **more often at night (1 AM - 6 AM)**.  
-- Certain **PCA features (V17, V14, V12, V10, V16) strongly correlate with fraud**.  
-- Fraud transactions **tend to have different distributions** in key features.  
+SHAP (`TreeExplainer`) confirms the model's top drivers largely match EDA's correlation analysis (`v14`, `v12`, `v10`, `v17`) — but also surfaces `v4` as a top-2 global driver despite weak linear correlation with the target, indicating XGBoost is capturing nonlinear/interaction effects that simple correlation can't see. Individual force plots trace exactly which features pushed a specific transaction toward a fraud classification, useful for case-level review.
 
-**Preprocessing Summary:**  
-- **Applied StandardScaler** for feature scaling.  
-- **Tested different SMOTE strategies** (Baseline, Weighted, Hybrid).  
-- **Hybrid SMOTE (Oversampling + Undersampling) significantly improved model performance.**  
-- **Final dataset check passed** → No missing values, dataset is balanced & ready for training.  
+## Monitoring
 
-**Feature Importance Summary:**  
-- **SHAP analysis confirmed that V4, V14, and V12 are key fraud indicators.**  
-- **Transaction amount also has a moderate influence** on fraud detection.  
-- **Decision plots reveal how fraud risk increases with certain feature values.**  
+Monitoring is built under a real production constraint: **no ground-truth labels are available at prediction time** (real fraud labels arrive weeks later via chargebacks/investigation, if at all). Every monitoring signal here is derived without peeking at true labels:
 
-**Overfitting Summary:**  
-- **SMOTE XGBoost was overfitting** (near-zero training loss, high recall but unrealistic performance).  
-- **Hybrid SMOTE significantly improved generalization** while maintaining strong fraud detection capability.  
-
----
-
-## **Final Steps Before Deployment**
-1. **Save & document the final model.**  
-2. **Prepare for model deployment.**  
-3. **Wrap up the project with a final report.**
-
----
+- **Confidence-band flagging** — predictions with `fraud_probability` between 0.4–0.6 are surfaced as low-confidence, a candidate signal for routing to human review rather than full automation.
+- **PSI (Population Stability Index) drift detection** — compares each feature's distribution in recent live predictions against the original training distribution (quantile-binned, standard 0.1/0.25 watch/alert thresholds), catching silent data drift before it manifests as degraded performance.
+- **Latency monitoring** — p50/p95/p99/max prediction latency, aggregated hourly, tracked from the same `prediction_logs` table.
 
 ## Project Structure
+
 ```
-FraudDetectAI/
-│── src/
-│   ├── datasets/           # Raw and processed datasets
-│   ├── models/             # Trained models
-│   ├── notebooks/          # Jupyter notebooks for analysis
-│   ├── images/             # Saved visualizations
-│   ├── reports/            # Project reports & summaries
-│── .gitignore              # Ignore the uncessary files
-│── README.md               # Project documentation
-│── requirements.txt        # Dependencies
+src/
+  exception.py           # CustomException — structured error context (type, file, function, line)
+  logger.py               # JSON logging: per-run training logs, daily-rotated error logs
+  utils.py                 # model/scaler save-load, generic SQL read/write
+  config.py               # Centralized config loader (config/config.yaml)
+  db/
+    get_engine.py          # Single SQLAlchemy engine, shared across the codebase
+    create_log_table.py    # prediction_logs schema
+  components/
+    data_ingestion.py       # dedup + stratified split, persisted to SQL
+    preprocessing.py        # hour_of_day engineering, RobustScaler fit/apply
+    hyperparameter_tuning.py # Optuna study (PR-AUC objective)
+    evaluation.py            # metrics computation, JSON-serializable
+  pipelines/
+    train_pipeline.py       # orchestrates ingestion -> preprocessing -> tuning -> fit -> eval -> save
+    predict_pipeline.py      # single-transaction inference, logs to prediction_logs
+api/
+  main.py                   # FastAPI: /predict, /health
+scripts/
+  simulate_stream.py        # replays test set through the live API, one transaction at a time
+  drift_monitoring.py        # PSI report
+  latency_monitoring.py      # latency percentile report
+  monitoring.py               # confidence-band + daily volume report
+tests/
+  test_preprocessing.py
+  test_exception.py
+  test_evaluation.py
+  test_api.py
+config/
+  config.yaml               # all tunable thresholds, filenames, hyperparameter search ranges
+.github/workflows/
+  tests.yml                 # CI: pytest on every push/PR to master
 ```
 
----
+## Getting Started
 
-## Model Download  
-You can download the trained **XGBoost Hybrid Model** from:  
+```bash
+git clone https://github.com/otuemre/FraudDetectAI.git
+cd FraudDetectAI
 
-**GitHub Repository:** [src/models/xgb_hybrid.pkl](https://github.com/otuemre/FraudDetectAI/blob/master/src/models/xgboost_smote_hybrid.pkl)
+cp .env.example .env  # fill in Postgres credentials
 
-## Acknowledgments
-This project is based on the **Credit Card Fraud Detection dataset** from [mlg-ulb](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
+docker compose up -d  # starts Postgres
+
+pip install -r requirements.txt
+```
+
+Run the training pipeline:
+```bash
+python -m src.pipelines.train_pipeline
+```
+
+Start the API:
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+## API Usage
+
+**Health check:**
+```bash
+curl http://localhost:8000/health
+```
+
+**Predict:**
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"time": 40000, "v1": -1.35, "v2": -0.07, ..., "v28": -0.02, "amount": 149.62}'
+```
+Interactive docs available at `http://localhost:8000/docs` (FastAPI auto-generated Swagger UI).
+
+## Testing & CI/CD
+
+```bash
+pytest tests/ -v
+```
+
+Tests cover pure logic (`preprocessing`, `exception`) and the API contract (`test_api.py`, via mocked prediction calls — no live DB or model file required in CI) and metric computation (`evaluation`, via a fake model with known outputs). Deliberately **not** unit-tested: SQL-dependent components (`data_ingestion`, `monitoring`, `drift_monitoring`) and Optuna's search itself — these require either a live database or aren't meaningfully verifiable via unit tests; a larger deployment would add integration tests against a test database.
+
+GitHub Actions runs the full suite on every push/PR to `master` (`.github/workflows/tests.yml`).
+
+## Design Decisions Worth Noting
+
+- **Config vs. environment variables:** `config.yaml` holds *behavioral* settings (thresholds, hyperparameter ranges, table/file names) that might reasonably change between runs. `.env` holds *secrets/environment-specific* values (DB credentials). Structural paths (`models/`, `data/`) are neither — they're fixed by the codebase's own layout and live directly in code.
+- **`prediction_logs` stores the full feature vector**, including raw `amount`/`time`-derived fields — deliberately not privacy-safe for a real deployment with genuine customer data, but appropriate here since all "live" traffic is a replay of a held-out test set with no real new data involved. A production system would encrypt or minimize this.
+- **CustomException + structured JSON logging**, wrapping every component's I/O boundary, was built specifically to make debugging traceable (exact file/function/line/error type) in JSON logs rather than parsing raw tracebacks — and it caught a real bug during test-writing (an error-type field that was silently logging the wrong value).
+- **Isolation Forest and the AutoEncoder are evaluated with knowledge of the true fraud rate** (via `contamination`/threshold quantile), which is a simplification a truly blind unsupervised deployment wouldn't have. Noted here rather than hidden.
+
+## Future Work
+
+- Delayed ground-truth reconciliation (simulating chargebacks arriving weeks later, to compute real retrospective accuracy)
+- Containerize the API alongside Postgres in `docker-compose.yml`
+- Deploy via AWS App Runner
+- Threshold tuning based on business cost trade-offs (precision/recall operating point), rather than a fixed 0.5 default
 
 ## License
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE.md) file for details.
+
+See [LICENSE.md](LICENSE.md).
