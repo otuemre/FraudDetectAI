@@ -14,7 +14,7 @@ class CustomException(Exception):
     def __init__(self, original_exception: Exception, error_detail: sys):
         super().__init__(str(original_exception))
         self.original_exception = original_exception
-        self.error_type = error_detail.__name__
+        self.error_type = type(original_exception).__name__
         self.message = str(original_exception)
 
         _, _, exc_tb = sys.exc_info()
